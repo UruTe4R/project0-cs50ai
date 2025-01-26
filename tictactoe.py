@@ -151,10 +151,15 @@ def minimax(board):
     if terminal(board):
         return None
         
+    alpha = -math.inf
+    beta = math.inf
     score_and_action = []
+
     if player(board) == X:
         for action in actions(board):
-            v = min_value(result(board, action))
+            v = min_value(result(board, action), alpha, beta)
+            if v > alpha:
+                alpha = v
             score_and_action.append((v, action))
             if v == 1:
                 return action
@@ -162,41 +167,54 @@ def minimax(board):
 
     if player(board) == O:
         for action in actions(board):
-            v = max_value(result(board, action))
+            v = max_value(result(board, action), alpha, beta)
+            if v < beta:
+                beta = v
             score_and_action.append((v, action))
             if v == -1:
                 return action
         return min(score_and_action, key=lambda x: x[0])[1]
     
 
-def max_value(board):
-
-    # Assume the value is -infinity because the player is trying to maximize its value
+def max_value(board, alpha, beta):
+    """
+    Maximizing player: X.
+    Added alpha-beta pruning logic.
+    """
     value = -math.inf
 
     # if the game is over, return the utility point
     if terminal(board):
         return utility(board)
-    
+
     # What are min's possible moves
     for action in actions(board):
         board_after_move = result(board, action)
-        min_move_v = min_value(board_after_move)
-        value = max(value, min_move_v)
+        v = min_value(board_after_move, alpha, beta)
+        value = max(value, v)
+        if value >= beta:
+            return value
+        alpha = max(alpha, value)
     return value
 
-def min_value(board):
 
-    # Assume the value is infinity because the player is trying to minimize its value
+def min_value(board, alpha, beta):
+    """
+    Minimizing player: O.
+    Added alpha-beta pruning logic.
+    """
     value = math.inf
 
     # if the game is over, return the utility point
     if terminal(board):
         return utility(board)
-    
+
     # What are possible moves
     for action in actions(board):
         board_after_move = result(board, action)
-        max_move_v = max_value(board_after_move)
-        value = min(value, max_move_v)
+        v = max_value(board_after_move, alpha, beta)
+        value = min(value, v)
+        if value <= alpha:
+            return value
+        beta = min(beta, value)
     return value
