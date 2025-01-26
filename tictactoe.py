@@ -150,14 +150,11 @@ def minimax(board):
     """
     if terminal(board):
         return None
-    alpha = -math.inf
-    beta = math.inf
+        
     score_and_action = []
     if player(board) == X:
         for action in actions(board):
-            v = min_value(result(board, action), alpha, beta)
-            if v > alpha:
-                alpha = v
+            v = min_value(result(board, action))
             score_and_action.append((v, action))
             if v == 1:
                 return action
@@ -165,19 +162,17 @@ def minimax(board):
 
     if player(board) == O:
         for action in actions(board):
-            v = max_value(result(board, action), alpha, beta)
-            if v < beta:
-                beta = v
+            v = max_value(result(board, action))
             score_and_action.append((v, action))
             if v == -1:
                 return action
         return min(score_and_action, key=lambda x: x[0])[1]
     
 
-def max_value(board, alpha, beta):
+def max_value(board):
 
     # Assume the value is -infinity because the player is trying to maximize its value
-    value = -math.inf    
+    value = -math.inf
 
     # if the game is over, return the utility point
     if terminal(board):
@@ -188,11 +183,9 @@ def max_value(board, alpha, beta):
         board_after_move = result(board, action)
         min_move_v = min_value(board_after_move)
         value = max(value, min_move_v)
-        if value < alpha:
-            return value
     return value
 
-def min_value(board, alpha, beta):
+def min_value(board):
 
     # Assume the value is infinity because the player is trying to minimize its value
     value = math.inf
